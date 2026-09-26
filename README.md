@@ -28,6 +28,27 @@ Dev mode (restart on file changes):
 npm run dev
 ```
 
+
+## Deploy on Vercel
+
+This repo also deploys as:
+
+- Static UI from `public/`
+- Serverless `POST /api/session` (`api/session.js`) that calls `client.live.create` with your project `OPENAI_API_KEY`
+
+### One-time env
+
+In the Vercel project **voice-news-live** set:
+
+| Variable | Notes |
+| --- | --- |
+| `OPENAI_API_KEY` | Encrypted / sensitive. Required for Live sessions. |
+| `RESPONSES_MODEL` | Optional. Default `gpt-5.6-terra`. |
+
+Production URL: https://voice-news-live.vercel.app
+
+Local `npm start` still works for offline iteration.
+
 ## Environment
 
 | Variable | Default | Purpose |

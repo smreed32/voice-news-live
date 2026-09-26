@@ -1,7 +1,7 @@
 {
   "name": "voice-news-live",
-  "version": "1.0.0",
-  "description": "Voice-powered AI news demo using OpenAI GPT-Live WebRTC",
+  "version": "1.1.0",
+  "description": "Voice-powered AI news demo using OpenAI GPT-Live WebRTC (local + Vercel)",
   "type": "module",
   "private": true,
   "engines": {
