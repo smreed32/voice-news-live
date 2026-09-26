@@ -315,9 +315,7 @@ function handleServerEvent(event) {
       endBtn.disabled = false;
       setState(
         "listening",
-        sessionId
-          ? `Connected (${sessionId}). Ask Mommy's Helper anything.`
-          : "Connected. Ask Mommy's Helper anything."
+        "You're connected. Ask Mommy's Helper anything."
       );
       clearError();
       break;
