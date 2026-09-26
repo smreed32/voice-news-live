@@ -315,14 +315,13 @@ function handleServerEvent(event) {
       endBtn.disabled = false;
       setState("speaking", "Mommy's Helper is saying hello…");
       clearError();
-      // Kick the first spoken turn so the greeting starts immediately.
+      // GPT-Live greeting: session.instructions.append (not Realtime response.create).
       sendEvent({
-        type: "response.create",
+        type: "session.instructions.append",
         event_id: eventId("greeting"),
-        response: {
-          instructions:
-            'Speak this greeting aloud exactly once, word for word, then wait for Courtney: "Hi Courtney. What can I help you with today? Ask me anything."',
-        },
+        delegation_id: null,
+        content:
+          "Immediately say the following greeting exactly and in full, then pause and listen: Hi Courtney. What can I help you with today? Ask me anything.",
       });
       break;
 
