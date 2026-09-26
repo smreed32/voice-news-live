@@ -313,11 +313,17 @@ function handleServerEvent(event) {
       ready = true;
       sessionId = event.session?.id || null;
       endBtn.disabled = false;
-      setState(
-        "listening",
-        "You're connected. Ask Mommy's Helper anything."
-      );
+      setState("speaking", "Mommy's Helper is saying hello…");
       clearError();
+      // Kick the first spoken turn so the greeting starts immediately.
+      sendEvent({
+        type: "response.create",
+        event_id: eventId("greeting"),
+        response: {
+          instructions:
+            'Speak this greeting aloud exactly once, word for word, then wait for Courtney: "Hi Courtney. What can I help you with today? Ask me anything."',
+        },
+      });
       break;
 
     case "session.closed":
