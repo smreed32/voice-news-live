@@ -206,7 +206,7 @@ body {
 .brand-name {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(1.15rem, 2.6vw, 1.35rem);
+  font-size: clamp(1.05rem, 2.6vw, 1.35rem);
   letter-spacing: -0.01em;
   color: var(--ink);
   white-space: nowrap;
@@ -992,8 +992,8 @@ a.news-card:focus-visible {
     grid-template-columns: 1fr;
     text-align: center;
     justify-items: center;
-    gap: 12px;
-    margin: 0 0 14px;
+    gap: 10px;
+    margin: 0 0 12px;
     padding: 0;
   }
 
@@ -1042,8 +1042,23 @@ a.news-card:focus-visible {
 }
 
 @media (max-width: 520px) {
+  :root {
+    --topbar-h: 44px;
+  }
+
+  .topbar-inner {
+    min-height: var(--topbar-h);
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  /* Hero already shows the full name; drop the crowded topbar label. */
+  .brand-name {
+    display: none;
+  }
+
   .app {
-    padding-top: 8px;
+    padding-top: 4px;
   }
 
   .portrait-frame {
@@ -1051,7 +1066,19 @@ a.news-card:focus-visible {
   }
 
   .portrait-glow {
-    inset: -14px;
+    inset: -10px;
+    filter: blur(12px);
+  }
+
+  .portrait-ring {
+    inset: -6px;
+    box-shadow:
+      0 14px 28px rgba(200, 100, 140, 0.2),
+      0 0 0 6px rgba(255, 255, 255, 0.55);
+  }
+
+  .portrait-sparkles {
+    inset: -10px;
   }
 
   .name-chips {
