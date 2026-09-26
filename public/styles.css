@@ -910,6 +910,24 @@ body {
   box-shadow: var(--shadow-lift);
 }
 
+a.news-card {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+a.news-card:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 3px;
+}
+
+.news-card .open-hint {
+  margin-left: auto;
+  color: var(--baby-deep);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
 .news-card h3 {
   margin: 0;
   font-family: var(--font-display);

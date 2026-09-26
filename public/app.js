@@ -181,8 +181,19 @@ function renderArticles(articles) {
   articleCount.textContent = `${articles.length} stor${articles.length === 1 ? "y" : "ies"}`;
 
   for (const article of articles) {
-    const card = document.createElement("article");
+    const url =
+      article.url && /^https?:\/\//i.test(article.url) ? article.url : null;
+    const card = document.createElement(url ? "a" : "article");
     card.className = "news-card";
+    if (url) {
+      card.href = url;
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+      card.setAttribute(
+        "aria-label",
+        `Open story: ${article.headline || "Untitled"}`
+      );
+    }
 
     const title = document.createElement("h3");
     title.textContent = article.headline || "Untitled";
@@ -204,13 +215,11 @@ function renderArticles(articles) {
       meta.append(date);
     }
 
-    if (article.url && /^https?:\/\//i.test(article.url)) {
-      const link = document.createElement("a");
-      link.href = article.url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = "Open source";
-      meta.append(link);
+    if (url) {
+      const hint = document.createElement("span");
+      hint.className = "open-hint";
+      hint.textContent = "Open story";
+      meta.append(hint);
     }
 
     card.append(title, summary, meta);
