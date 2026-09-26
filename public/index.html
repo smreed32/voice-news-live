@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Voice News Live</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <h1>Voice News Live</h1>
+            <p class="tagline">Speak a topic. Get grounded headlines.</p>
+          </div>
+        </div>
+        <div class="status-wrap">
+          <span id="statusChip" class="status-chip" data-state="idle">idle</span>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel voice-panel" aria-label="Voice controls">
+          <div class="controls">
+            <button id="startBtn" type="button" class="btn primary">Start</button>
+            <button id="endBtn" type="button" class="btn ghost" disabled>End</button>
+          </div>
+          <p id="statusDetail" class="status-detail">Press Start, then ask for news on any topic.</p>
+          <div id="researchBanner" class="research-banner" hidden>
+            <span class="pulse" aria-hidden="true"></span>
+            <span id="researchText">Researching…</span>
+          </div>
+          <div id="errorBox" class="error-box" hidden role="alert"></div>
+
+          <div class="transcript-header">
+            <h2>Live transcript</h2>
+            <button id="clearTranscriptBtn" type="button" class="btn tiny ghost">Clear</button>
+          </div>
+          <div id="transcript" class="transcript" aria-live="polite"></div>
+
+          <audio id="remoteAudio" autoplay playsinline></audio>
+        </section>
+
+        <section class="panel news-panel" aria-label="News results">
+          <div class="news-header">
+            <h2>News cards</h2>
+            <span id="articleCount" class="muted">No articles yet</span>
+          </div>
+          <div id="emptyNews" class="empty-news">
+            Ask for headlines, a beat, or a region. After search, grounded articles appear here.
+          </div>
+          <div id="newsList" class="news-list"></div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>GPT-Live WebRTC demo</span>
+        <span class="dot" aria-hidden="true">·</span>
+        <span>API key stays on the server</span>
+      </footer>
+    </div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

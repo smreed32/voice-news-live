@@ -1,0 +1,21 @@
+{
+  "name": "voice-news-live",
+  "version": "1.0.0",
+  "description": "Voice-powered AI news demo using OpenAI GPT-Live WebRTC",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "author": "Scott Reed (smreed32)",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "openai": "^7.14.0"
+  }
+}
