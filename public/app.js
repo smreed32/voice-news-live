@@ -1,5 +1,5 @@
 /**
- * Mommy's Helper - browser client (Voice News Live)
+ * Mommy's Little Helper - browser client (Voice News Live)
  *
  * Official GPT-Live WebRTC flow:
  *   RTCPeerConnection + getUserMedia + data channel "oai-events"
@@ -144,7 +144,7 @@ function ensureTurn(role, key) {
   el.className = `bubble ${role}`;
   const roleEl = document.createElement("span");
   roleEl.className = "role";
-  roleEl.textContent = role === "user" ? "You" : "Mommy's Helper";
+  roleEl.textContent = role === "user" ? "You" : "Mommy's Little Helper";
   const body = document.createElement("div");
   body.className = "body";
   el.append(roleEl, body);
@@ -193,7 +193,7 @@ function renderArticles(articles) {
     const emptyCopy = document.createElement("p");
     emptyCopy.className = "empty-copy";
     emptyCopy.textContent =
-      "No stories came back this time. Try another topic whenever you like. Mommy's Helper is still here.";
+      "No stories came back this time. Try another topic whenever you like. Mommy's Little Helper is still here.";
     emptyNews.replaceChildren(emptyOrb, emptyTitle, emptyCopy);
     articleCount.textContent = "0 stories";
     return;
@@ -348,7 +348,7 @@ function handleServerEvent(event) {
       endedForIdle = false;
       setState(
         "listening",
-        "You're connected. Ask Mommy's Helper anything."
+        "You're connected. Ask Mommy's Little Helper anything."
       );
       clearError();
       armIdleTimer();
@@ -459,7 +459,7 @@ async function startSession() {
   startBtn.disabled = true;
   finalized = false;
   clearError();
-  setState("thinking", "Connecting Mommy's Helper…");
+  setState("thinking", "Connecting Mommy's Little Helper…");
 
   try {
     const connection = new RTCPeerConnection();
@@ -470,7 +470,7 @@ async function startSession() {
       remoteAudio.classList.add("visible");
       remoteAudio.play().catch(() => {
         statusDetail.textContent =
-          "Select play on the audio controls to hear Mommy's Helper.";
+          "Select play on the audio controls to hear Mommy's Little Helper.";
       });
     });
 
