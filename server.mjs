@@ -18,7 +18,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 const port = Number(process.env.PORT) || 3000;
-const origin = `http://localhost:${port}`;
+const allowedOrigins = new Set([
+  `http://localhost:${port}`,
+  `http://127.0.0.1:${port}`,
+  `http://[::1]:${port}`,
+]);
 const responsesModel = process.env.RESPONSES_MODEL || "gpt-5.6-terra";
 
 const LIVE_INSTRUCTIONS = [
@@ -94,9 +98,26 @@ app.use(express.static(join(__dirname, "public")));
 
 // Local-only demo. Add authentication and authorization before exposing
 // session creation beyond localhost.
+function isAllowedLocalOrigin(request) {
+  const incoming = request.headers.origin;
+  if (!incoming) {
+    // Same-origin navigations sometimes omit Origin; trust Host for local demo.
+    const host = String(request.headers.host || "");
+    return (
+      host === `localhost:${port}` ||
+      host === `127.0.0.1:${port}` ||
+      host === `[::1]:${port}`
+    );
+  }
+  return allowedOrigins.has(incoming);
+}
+
 app.post("/api/session", async (request, response) => {
-  if (request.headers.origin !== origin) {
-    response.status(403).json({ error: "Unexpected request origin" });
+  if (!isAllowedLocalOrigin(request)) {
+    response.status(403).json({
+      error: "Unexpected request origin",
+      hint: `Open http://localhost:${port} (or http://127.0.0.1:${port})`,
+    });
     return;
   }
   if (typeof request.body?.sdp !== "string" || !request.body.sdp.trim()) {
