@@ -3,31 +3,62 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Voice News Live</title>
+    <title>Courtney's News Brief · Gary &amp; Tucker</title>
+    <meta name="description" content="A warm morning news brief for Courtney, with love from Gary and Tucker." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <div class="ambient" aria-hidden="true"></div>
     <div class="app">
-      <header class="topbar">
-        <div class="brand">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <div>
-            <h1>Voice News Live</h1>
-            <p class="tagline">Speak a topic. Get grounded headlines.</p>
+      <header class="hero">
+        <div class="hero-portrait">
+          <div class="portrait-ring">
+            <img
+              src="/media/gary-tucker.jpg"
+              alt="Gary the dog and Tucker the cat, side by side"
+              width="320"
+              height="320"
+            />
+          </div>
+          <div class="name-chips" aria-label="From Gary and Tucker">
+            <span class="chip chip-gary">Gary</span>
+            <span class="chip-sep" aria-hidden="true">·</span>
+            <span class="chip chip-tucker">Tucker</span>
           </div>
         </div>
-        <div class="status-wrap">
-          <span id="statusChip" class="status-chip" data-state="idle">idle</span>
+        <div class="hero-copy">
+          <p class="eyebrow">For Courtney</p>
+          <h1>Courtney's News Brief</h1>
+          <p class="subtitle">With love from Gary &amp; Tucker</p>
+          <p class="lede">
+            A calm morning listen. Ask for any topic, and your companions will
+            gather grounded headlines just for you.
+          </p>
+          <div class="status-wrap">
+            <span id="statusChip" class="status-chip" data-state="idle">idle</span>
+          </div>
         </div>
       </header>
 
       <main class="layout">
         <section class="panel voice-panel" aria-label="Voice controls">
           <div class="controls">
-            <button id="startBtn" type="button" class="btn primary">Start</button>
-            <button id="endBtn" type="button" class="btn ghost" disabled>End</button>
+            <button id="startBtn" type="button" class="btn primary">
+              Start listening
+            </button>
+            <button id="endBtn" type="button" class="btn ghost" disabled>
+              End
+            </button>
           </div>
-          <p id="statusDetail" class="status-detail">Press Start, then ask for news on any topic.</p>
+          <p id="statusDetail" class="status-detail">
+            Press Start listening, then tell Gary &amp; Tucker what you would like to hear.
+          </p>
           <div id="researchBanner" class="research-banner" hidden>
             <span class="pulse" aria-hidden="true"></span>
             <span id="researchText">Researching…</span>
@@ -35,8 +66,10 @@
           <div id="errorBox" class="error-box" hidden role="alert"></div>
 
           <div class="transcript-header">
-            <h2>Live transcript</h2>
-            <button id="clearTranscriptBtn" type="button" class="btn tiny ghost">Clear</button>
+            <h2>Conversation</h2>
+            <button id="clearTranscriptBtn" type="button" class="btn tiny ghost">
+              Clear
+            </button>
           </div>
           <div id="transcript" class="transcript" aria-live="polite"></div>
 
@@ -45,20 +78,21 @@
 
         <section class="panel news-panel" aria-label="News results">
           <div class="news-header">
-            <h2>News cards</h2>
+            <h2>Today's headlines</h2>
             <span id="articleCount" class="muted">No articles yet</span>
           </div>
           <div id="emptyNews" class="empty-news">
-            Ask for headlines, a beat, or a region. After search, grounded articles appear here.
+            Ask for a topic whenever you are ready. Gary &amp; Tucker are listening,
+            and they will bring back a gentle stack of grounded stories for you.
           </div>
           <div id="newsList" class="news-list"></div>
         </section>
       </main>
 
       <footer class="footer">
-        <span>GPT-Live WebRTC demo</span>
+        <span>A little gift from Gary &amp; Tucker to Courtney</span>
         <span class="dot" aria-hidden="true">·</span>
-        <span>API key stays on the server</span>
+        <span class="footer-aside">Voice brief · private session</span>
       </footer>
     </div>
     <script type="module" src="/app.js"></script>

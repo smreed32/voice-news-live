@@ -112,7 +112,7 @@ function ensureTurn(role, key) {
   el.className = `bubble ${role}`;
   const roleEl = document.createElement("span");
   roleEl.className = "role";
-  roleEl.textContent = role === "user" ? "You" : "Assistant";
+  roleEl.textContent = role === "user" ? "You" : "Gary & Tucker";
   const body = document.createElement("div");
   body.className = "body";
   el.append(roleEl, body);
@@ -153,7 +153,7 @@ function renderArticles(articles) {
     newsList.innerHTML = "";
     emptyNews.hidden = false;
     emptyNews.textContent =
-      "No grounded articles came back. Try another topic or ask again in a moment.";
+      "No stories came back this time. Try another topic whenever you like. Gary & Tucker are still here.";
     articleCount.textContent = "0 articles";
     return;
   }
