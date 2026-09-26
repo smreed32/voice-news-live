@@ -33,6 +33,10 @@ let events = null;
 /** @type {MediaStream | null} */
 let microphone = null;
 let closeTimeout = null;
+/** @type {ReturnType<typeof setTimeout> | null} */
+let idleTimeout = null;
+const IDLE_MS = 60_000;
+let endedForIdle = false;
 let ready = false;
 let finalized = false;
 let sessionId = null;
@@ -87,7 +91,26 @@ function eventId(prefix) {
   return `${prefix}_${crypto.randomUUID().slice(0, 12)}`;
 }
 
+function clearIdleTimer() {
+  clearTimeout(idleTimeout);
+  idleTimeout = null;
+}
+
+/** Count down while waiting for the user to speak; pause while Helper talks or researches. */
+function armIdleTimer() {
+  clearIdleTimer();
+  if (!ready || finalized) return;
+  idleTimeout = setTimeout(() => {
+    idleTimeout = null;
+    if (!ready || finalized) return;
+    endedForIdle = true;
+    setState("thinking", "Ending after a minute of quiet…");
+    endSession();
+  }, IDLE_MS);
+}
+
 function cleanup() {
+  clearIdleTimer();
   clearTimeout(closeTimeout);
   closeTimeout = null;
   microphone?.getTracks().forEach((track) => track.stop());
@@ -322,27 +345,37 @@ function handleServerEvent(event) {
       ready = true;
       sessionId = event.session?.id || null;
       endBtn.disabled = false;
+      endedForIdle = false;
       setState(
         "listening",
         "You're connected. Ask Mommy's Helper anything."
       );
       clearError();
+      armIdleTimer();
       break;
 
     case "session.closed":
       finalized = true;
       console.log("Final session usage", event.usage);
-      setState("idle", "Conversation ended. Ask again anytime.");
+      setState(
+        "idle",
+        endedForIdle
+          ? "Ended after a minute of quiet. Tap Ask anything anytime."
+          : "Conversation ended. Ask again anytime."
+      );
+      endedForIdle = false;
       cleanup();
       break;
 
     case "session.input_transcript.delta":
       appendTranscript("user", event.delta || "", `user:${event.item_id || "live"}`);
       setState("listening");
+      armIdleTimer();
       break;
 
     case "session.input_transcript.done":
       finalizeTurn(`user:${event.item_id || "live"}`);
+      clearIdleTimer();
       break;
 
     case "session.output_transcript.delta":
@@ -352,26 +385,31 @@ function handleServerEvent(event) {
         `assistant:${event.item_id || "live"}`
       );
       setState("speaking");
+      clearIdleTimer();
       break;
 
     case "session.output_transcript.done":
       finalizeTurn(`assistant:${event.item_id || "live"}`);
       setState("listening", "Listening… ask anything.");
+      armIdleTimer();
       break;
 
     case "session.delegation.created":
       setResearching(true, "Looking that up for you…");
+      clearIdleTimer();
       break;
 
     case "session.commentary.append":
     case "session.commentary.appended":
       setResearching(true, "Gathering a few notes…");
+      clearIdleTimer();
       break;
 
     case "session.thinking.append":
     case "session.thinking.appended":
       setResearching(true, "Thinking it through…");
       setState("thinking");
+      clearIdleTimer();
       break;
 
     case "response.event":
@@ -523,11 +561,20 @@ async function startSession() {
 
 function endSession() {
   if (!ready || !events || events.readyState !== "open") return;
+  clearIdleTimer();
   endBtn.disabled = true;
-  setState("thinking", "Wrapping up…");
+  if (!endedForIdle) {
+    setState("thinking", "Wrapping up…");
+  }
   sendEvent({ type: "session.close" });
   closeTimeout = setTimeout(() => {
-    setState("idle", "Session closed. You can start again anytime.");
+    setState(
+      "idle",
+      endedForIdle
+        ? "Ended after a minute of quiet. Tap Ask anything anytime."
+        : "Session closed. You can start again anytime."
+    );
+    endedForIdle = false;
     cleanup();
   }, 15_000);
 }
