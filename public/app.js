@@ -180,8 +180,44 @@ function formatDate(value) {
   }
 }
 
-function renderArticles(articles) {
-  if (!Array.isArray(articles) || articles.length === 0) {
+const KIND_LABELS = {
+  article: "Article",
+  podcast: "Podcast",
+  website: "Website",
+  video: "Video",
+  other: "Link",
+};
+
+const KIND_OPEN = {
+  article: "Open article",
+  podcast: "Open episode",
+  website: "Open site",
+  video: "Open video",
+  other: "Open link",
+};
+
+function normalizeLinkItems(payload) {
+  const raw = Array.isArray(payload?.items)
+    ? payload.items
+    : Array.isArray(payload?.articles)
+      ? payload.articles
+      : [];
+  return raw.map((item) => {
+    const kind = String(item.kind || "article").toLowerCase();
+    const known = KIND_LABELS[kind] ? kind : "other";
+    return {
+      title: item.title || item.headline || "Untitled",
+      summary: item.summary || "",
+      source: item.source || "Unknown source",
+      url: item.url || "",
+      kind: known,
+      published_at: item.published_at || null,
+    };
+  });
+}
+
+function renderLinkCards(items) {
+  if (!Array.isArray(items) || items.length === 0) {
     newsList.innerHTML = "";
     emptyNews.hidden = false;
     const emptyOrb = document.createElement("div");
@@ -193,45 +229,45 @@ function renderArticles(articles) {
     const emptyCopy = document.createElement("p");
     emptyCopy.className = "empty-copy";
     emptyCopy.textContent =
-      "No stories came back this time. Try another topic whenever you like. Mommy's Little Helper is still here.";
+      "No links came back this time. Try another topic whenever you like. Mommy's Little Helper is still here.";
     emptyNews.replaceChildren(emptyOrb, emptyTitle, emptyCopy);
-    articleCount.textContent = "0 stories";
+    articleCount.textContent = "0 links";
     return;
   }
 
   emptyNews.hidden = true;
   newsList.innerHTML = "";
-  articleCount.textContent = `${articles.length} stor${articles.length === 1 ? "y" : "ies"}`;
+  articleCount.textContent = `${items.length} link${items.length === 1 ? "" : "s"}`;
 
-  for (const article of articles) {
-    const url =
-      article.url && /^https?:\/\//i.test(article.url) ? article.url : null;
+  for (const item of items) {
+    const url = item.url && /^https?:\/\//i.test(item.url) ? item.url : null;
     const card = document.createElement(url ? "a" : "article");
     card.className = "news-card";
     if (url) {
       card.href = url;
       card.target = "_blank";
       card.rel = "noopener noreferrer";
-      card.setAttribute(
-        "aria-label",
-        `Open story: ${article.headline || "Untitled"}`
-      );
+      card.setAttribute("aria-label", `${KIND_OPEN[item.kind]}: ${item.title}`);
     }
 
+    const kind = document.createElement("span");
+    kind.className = `card-kind card-kind-${item.kind}`;
+    kind.textContent = KIND_LABELS[item.kind];
+
     const title = document.createElement("h3");
-    title.textContent = article.headline || "Untitled";
+    title.textContent = item.title;
 
     const summary = document.createElement("p");
-    summary.textContent = article.summary || "";
+    summary.textContent = item.summary;
 
     const meta = document.createElement("div");
     meta.className = "meta";
 
     const source = document.createElement("span");
-    source.textContent = article.source || "Unknown source";
+    source.textContent = item.source;
     meta.append(source);
 
-    const when = formatDate(article.published_at);
+    const when = formatDate(item.published_at);
     if (when) {
       const date = document.createElement("span");
       date.textContent = when;
@@ -241,26 +277,26 @@ function renderArticles(articles) {
     if (url) {
       const hint = document.createElement("span");
       hint.className = "open-hint";
-      hint.textContent = "Open story";
+      hint.textContent = KIND_OPEN[item.kind];
       meta.append(hint);
     }
 
-    card.append(title, summary, meta);
+    card.append(kind, title, summary, meta);
     newsList.append(card);
   }
 }
 
-function handlePresentNewsResults(callId, argumentsJson, delegationId) {
+function handlePresentLinkCards(callId, argumentsJson, delegationId) {
   let parsed;
   try {
     parsed = JSON.parse(argumentsJson || "{}");
   } catch (error) {
-    console.warn("Failed to parse present_news_results arguments", error);
-    parsed = { articles: [] };
+    console.warn("Failed to parse present_link_cards arguments", error);
+    parsed = { items: [] };
   }
 
-  const articles = Array.isArray(parsed.articles) ? parsed.articles : [];
-  renderArticles(articles);
+  const items = normalizeLinkItems(parsed);
+  renderLinkCards(items);
 
   sendEvent({
     type: "response.item.create",
@@ -270,10 +306,10 @@ function handlePresentNewsResults(callId, argumentsJson, delegationId) {
       call_id: callId,
       output: JSON.stringify({
         status: "received",
-        rendered: articles.length,
+        rendered: items.length,
         message:
-          articles.length > 0
-            ? "Article cards rendered in the UI."
+          items.length > 0
+            ? "Link cards rendered in the UI with live URLs."
             : "Empty results shown in the UI.",
       }),
     },
@@ -308,8 +344,8 @@ function trackFunctionCall(delegationId, item) {
   }
   pending.add(item.call_id);
 
-  if (item.name === "present_news_results") {
-    handlePresentNewsResults(item.call_id, item.arguments, delegationId);
+  if (item.name === "present_link_cards" || item.name === "present_news_results") {
+    handlePresentLinkCards(item.call_id, item.arguments, delegationId);
   }
 }
 

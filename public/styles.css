@@ -912,6 +912,35 @@ a.news-card:focus-visible {
   font-size: 0.85rem;
 }
 
+.card-kind {
+  align-self: flex-start;
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--baby) 55%, white);
+  color: var(--baby-deep);
+  border: 1px solid var(--line-soft);
+}
+
+.card-kind-podcast {
+  background: color-mix(in srgb, var(--lilac) 45%, white);
+  color: #6b4f8a;
+}
+
+.card-kind-website {
+  background: color-mix(in srgb, var(--pink) 35%, white);
+  color: var(--pink-deep);
+}
+
+.card-kind-video {
+  background: color-mix(in srgb, var(--baby-deep) 25%, white);
+  color: #3d6f99;
+}
+
 .news-card h3 {
   margin: 0;
   font-family: var(--font-display);
