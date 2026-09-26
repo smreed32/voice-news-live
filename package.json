@@ -14,8 +14,10 @@
   "author": "Scott Reed (smreed32)",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
     "openai": "^7.14.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
   }
 }
