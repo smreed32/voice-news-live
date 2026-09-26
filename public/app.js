@@ -1,5 +1,5 @@
 /**
- * Voice News Live - browser client
+ * Mommy's Helper - browser client (Voice News Live)
  *
  * Official GPT-Live WebRTC flow:
  *   RTCPeerConnection + getUserMedia + data channel "oai-events"
@@ -44,9 +44,18 @@ const openTurns = new Map();
 /** @type {Map<string, Set<string>>} */
 const pendingCallsByDelegation = new Map();
 
+const STATE_LABELS = {
+  idle: "ready",
+  listening: "listening",
+  thinking: "thinking",
+  researching: "looking up",
+  speaking: "speaking",
+  error: "needs a moment",
+};
+
 function setState(state, detail) {
   statusChip.dataset.state = state;
-  statusChip.textContent = state;
+  statusChip.textContent = STATE_LABELS[state] || state;
   if (typeof detail === "string") {
     statusDetail.textContent = detail;
   }
@@ -63,7 +72,7 @@ function clearError() {
   errorBox.textContent = "";
 }
 
-function setResearching(active, label = "Researching…") {
+function setResearching(active, label = "Looking that up for you…") {
   researchBanner.hidden = !active;
   researchText.textContent = label;
   if (active) setState("researching", label);
@@ -112,7 +121,7 @@ function ensureTurn(role, key) {
   el.className = `bubble ${role}`;
   const roleEl = document.createElement("span");
   roleEl.className = "role";
-  roleEl.textContent = role === "user" ? "You" : "Gary & Tucker";
+  roleEl.textContent = role === "user" ? "You" : "Mommy's Helper";
   const body = document.createElement("div");
   body.className = "body";
   el.append(roleEl, body);
@@ -152,15 +161,24 @@ function renderArticles(articles) {
   if (!Array.isArray(articles) || articles.length === 0) {
     newsList.innerHTML = "";
     emptyNews.hidden = false;
-    emptyNews.textContent =
-      "No stories came back this time. Try another topic whenever you like. Gary & Tucker are still here.";
-    articleCount.textContent = "0 articles";
+    const emptyOrb = document.createElement("div");
+    emptyOrb.className = "empty-orb";
+    emptyOrb.setAttribute("aria-hidden", "true");
+    const emptyTitle = document.createElement("p");
+    emptyTitle.className = "empty-title";
+    emptyTitle.textContent = "Nothing this round";
+    const emptyCopy = document.createElement("p");
+    emptyCopy.className = "empty-copy";
+    emptyCopy.textContent =
+      "No stories came back this time. Try another topic whenever you like. Mommy's Helper is still here.";
+    emptyNews.replaceChildren(emptyOrb, emptyTitle, emptyCopy);
+    articleCount.textContent = "0 stories";
     return;
   }
 
   emptyNews.hidden = true;
   newsList.innerHTML = "";
-  articleCount.textContent = `${articles.length} article${articles.length === 1 ? "" : "s"}`;
+  articleCount.textContent = `${articles.length} stor${articles.length === 1 ? "y" : "ies"}`;
 
   for (const article of articles) {
     const card = document.createElement("article");
@@ -271,7 +289,7 @@ function handleNestedResponseEvent(envelope) {
   switch (nested.type) {
     case "response.created":
     case "response.in_progress":
-      setResearching(true, "Backend researching…");
+      setResearching(true, "Checking sources…");
       break;
     case "response.output_item.done":
       trackFunctionCall(delegationId, nested.item);
@@ -298,8 +316,8 @@ function handleServerEvent(event) {
       setState(
         "listening",
         sessionId
-          ? `Connected (${sessionId}). Ask for news on any topic.`
-          : "Connected. Ask for news on any topic."
+          ? `Connected (${sessionId}). Ask Mommy's Helper anything.`
+          : "Connected. Ask Mommy's Helper anything."
       );
       clearError();
       break;
@@ -307,7 +325,7 @@ function handleServerEvent(event) {
     case "session.closed":
       finalized = true;
       console.log("Final session usage", event.usage);
-      setState("idle", "Conversation ended.");
+      setState("idle", "Conversation ended. Ask again anytime.");
       cleanup();
       break;
 
@@ -331,21 +349,21 @@ function handleServerEvent(event) {
 
     case "session.output_transcript.done":
       finalizeTurn(`assistant:${event.item_id || "live"}`);
-      setState("listening", "Listening…");
+      setState("listening", "Listening… ask anything.");
       break;
 
     case "session.delegation.created":
-      setResearching(true, "Delegating to research backend…");
+      setResearching(true, "Looking that up for you…");
       break;
 
     case "session.commentary.append":
     case "session.commentary.appended":
-      setResearching(true, "Commentary updating…");
+      setResearching(true, "Gathering a few notes…");
       break;
 
     case "session.thinking.append":
     case "session.thinking.appended":
-      setResearching(true, "Thinking through research…");
+      setResearching(true, "Thinking it through…");
       setState("thinking");
       break;
 
@@ -360,7 +378,7 @@ function handleServerEvent(event) {
     default: {
       const type = String(event.type || "");
       if (type.startsWith("session.delegation.")) {
-        setResearching(true, "Research in progress…");
+        setResearching(true, "Still looking…");
         break;
       }
       // Useful while developing; keep quiet for high-frequency audio-adjacent events.
@@ -396,7 +414,7 @@ async function startSession() {
   startBtn.disabled = true;
   finalized = false;
   clearError();
-  setState("thinking", "Connecting…");
+  setState("thinking", "Connecting Mommy's Helper…");
 
   try {
     const connection = new RTCPeerConnection();
@@ -407,7 +425,7 @@ async function startSession() {
       remoteAudio.classList.add("visible");
       remoteAudio.play().catch(() => {
         statusDetail.textContent =
-          "Select play on the audio controls to hear the assistant.";
+          "Select play on the audio controls to hear Mommy's Helper.";
       });
     });
 
@@ -447,7 +465,7 @@ async function startSession() {
     events.addEventListener("close", (event) => {
       if (event.target !== events) return;
       if (!finalized) {
-        setState("idle", "Disconnected without final session usage.");
+        setState("idle", "Disconnected. Tap Ask anything to begin again.");
         cleanup();
       }
     });
@@ -488,7 +506,7 @@ async function startSession() {
       sdp: result.transport.sdp,
     });
     // The HTTP request started this session. Do not send session.start here.
-    setState("thinking", "Waiting for session.started…");
+    setState("thinking", "Almost ready…");
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     showError(message);
@@ -499,10 +517,10 @@ async function startSession() {
 function endSession() {
   if (!ready || !events || events.readyState !== "open") return;
   endBtn.disabled = true;
-  setState("thinking", "Finishing the conversation…");
+  setState("thinking", "Wrapping up…");
   sendEvent({ type: "session.close" });
   closeTimeout = setTimeout(() => {
-    setState("idle", "Incomplete finalization: no session.closed event.");
+    setState("idle", "Session closed. You can start again anytime.");
     cleanup();
   }, 15_000);
 }
